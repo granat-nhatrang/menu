@@ -1,4 +1,4 @@
 // Настройки меню ресторана Granat.
 // Вставьте между кавычками адрес веб-приложения Google (см. инструкцию, шаг 3).
 // Пока адрес пустой, меню работает в демо-режиме: заказы никуда не отправляются.
-window.GRANAT_API = "";
+window.GRANAT_API = "https://script.google.com/macros/s/AKfycbwVEWxcfDVCEsX9b1s_SCldHMVUP1_HF-tfY7DaykL45mXRkGMJvMZGSN95Eq25MjR8/exec";
