@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Granat Menu</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#0f0c0b">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Montserrat:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: одна колонка меню как в бумажной книге, липкая лента разделов, корзина снизу. Один темный вид в цветах бренда (черный + золото + гранат). */
+:root{
+  --bg:#0f0c0b; --surface:#1a1513; --raise:#241d1a; --line:rgba(201,165,74,.22);
+  --gold:#c9a54a; --gold-soft:#e2c97e; --fg:#f2ece3; --muted:#a39888; --wine:#8e2233; --ok:#6fae7c;
+  --display:"Cormorant Garamond","Cormorant",Georgia,"Times New Roman",serif;
+  --body:"Montserrat","Segoe UI",Roboto,Arial,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font:15px/1.45 var(--body);-webkit-tap-highlight-color:transparent;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-bottom:110px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+[hidden]{display:none!important}
+.wrap{max-width:640px;margin:0 auto}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+/* Header */
+.top{display:flex;flex-direction:column;align-items:center;padding-block:22px 6px;text-align:center;gap:4px}
+.top img{width:58px;height:auto;opacity:.95}
+.brand{font:700 40px/1 var(--display);letter-spacing:.06em;color:var(--gold);margin:6px 0 0}
+.brand small{display:block;font:600 11px/1 var(--body);letter-spacing:.42em;color:var(--fg);margin-top:8px;text-transform:uppercase}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:16px;width:100%}
+.table-pill{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px;font-weight:600;font-size:13px;letter-spacing:.02em}
+.table-pill b{color:var(--gold)}
+.lang{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.lang button{background:none;border:0;padding:7px 12px;font-size:12px;font-weight:600;letter-spacing:.08em;color:var(--muted)}
+.lang button[aria-pressed="true"]{background:var(--gold);color:#17110a}
+.service{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;width:100%}
+.service button{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px 8px;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:7px}
+.service button svg{width:17px;height:17px;stroke:var(--gold);fill:none;stroke-width:1.7}
+.service button:disabled{opacity:.45}
+.demo{margin-top:12px;font-size:12px;color:var(--gold-soft);border:1px dashed var(--line);border-radius:10px;padding:8px 10px;width:100%}
+
+/* Category strip */
+.cats{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);margin:14px calc(-1*max(16px,env(safe-area-inset-left,0px))) 0;padding:10px max(16px,env(safe-area-inset-left,0px));border-bottom:1px solid var(--line);
+  display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.cats::-webkit-scrollbar{display:none}
+.cats button{flex:none;background:none;border:1px solid transparent;border-radius:999px;padding:7px 13px;font-size:13px;font-weight:500;color:var(--muted);white-space:nowrap}
+.cats button.on{border-color:var(--gold);color:var(--gold)}
+
+/* Sections */
+section{scroll-margin-top:calc(env(safe-area-inset-top,0px) + 64px)}
+h2{font:600 30px/1.1 var(--display);color:var(--gold);text-transform:uppercase;letter-spacing:.04em;margin:30px 0 4px;text-wrap:balance}
+h2 + .orn{height:1px;background:linear-gradient(90deg,var(--gold),transparent);margin-bottom:6px;opacity:.6}
+.item{display:grid;grid-template-columns:1fr auto;gap:12px;padding:16px 0;border-bottom:1px dotted var(--line)}
+.item.has-img{grid-template-columns:84px 1fr}
+.thumb{width:84px;height:84px;border-radius:12px;object-fit:cover;background:var(--raise)}
+.info{min-width:0;display:flex;flex-direction:column;gap:4px}
+.name{font:600 21px/1.15 var(--display);margin:0;text-wrap:balance}
+.desc{font-size:12.5px;color:var(--muted);margin:0}
+.opts{font-size:12px;color:var(--gold-soft);margin:0}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:6px}
+.price{font-weight:700;font-size:15px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.price span{font-weight:500;color:var(--muted);font-size:12px;margin-left:3px}
+.add{background:none;border:1px solid var(--gold);color:var(--gold);border-radius:999px;padding:6px 14px;font-size:13px;font-weight:600;white-space:nowrap}
+.add:active{background:var(--gold);color:#17110a}
+.step{display:flex;align-items:center;border:1px solid var(--gold);border-radius:999px;overflow:hidden}
+.step button{background:none;border:0;width:34px;height:32px;font-size:18px;color:var(--gold);line-height:1}
+.step output{min-width:22px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
+.item.off{opacity:.45}
+.soldout{font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:5px 10px}
+
+/* Footer */
+footer{margin-top:40px;padding-block:22px;border-top:1px solid var(--line);display:grid;gap:10px;font-size:13px;color:var(--muted)}
+footer b{color:var(--fg);font-weight:600}
+.wifi{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.wifi button{background:none;border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:12px;color:var(--gold)}
+footer a{color:var(--gold-soft)}
+
+/* Cart bar */
+.cartbar{position:fixed;left:0;right:0;bottom:0;z-index:25;padding:10px max(16px,env(safe-area-inset-left,0px)) calc(10px + env(safe-area-inset-bottom,0px));background:linear-gradient(transparent,var(--bg) 30%)}
+.cartbar button{display:flex;justify-content:space-between;align-items:center;width:100%;max-width:640px;margin:0 auto;background:var(--gold);color:#17110a;border:0;border-radius:16px;padding:15px 18px;font-weight:700;font-size:15px;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+.cartbar .cnt{background:#17110a;color:var(--gold);border-radius:999px;min-width:26px;height:26px;display:inline-grid;place-items:center;font-size:13px;margin-right:10px;padding:0 7px}
+
+/* Sheet */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:40}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;max-height:88vh;overflow:auto;background:var(--surface);border-top:1px solid var(--line);border-radius:22px 22px 0 0;
+  padding:8px max(16px,env(safe-area-inset-left,0px)) calc(18px + env(safe-area-inset-bottom,0px))}
+.sheet-in{max-width:640px;margin:0 auto}
+.grip{width:40px;height:4px;border-radius:2px;background:var(--line);margin:4px auto 10px}
+.sheet h3{font:600 26px/1.15 var(--display);margin:4px 0 12px;color:var(--gold)}
+.line{display:grid;grid-template-columns:1fr auto;gap:8px 12px;align-items:center;padding:12px 0;border-bottom:1px dotted var(--line)}
+.line .n{font-weight:600;font-size:14px}
+.line .o{font-size:12px;color:var(--gold-soft)}
+.line .p{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.total{display:flex;justify-content:space-between;font-weight:700;font-size:17px;margin:16px 0 4px;font-variant-numeric:tabular-nums}
+.note{font-size:12px;color:var(--muted);margin:0 0 12px}
+label.lbl{display:block;font-size:12px;color:var(--muted);margin:14px 0 6px;letter-spacing:.04em}
+textarea,select{width:100%;background:var(--raise);color:var(--fg);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font:inherit;font-size:16px}
+textarea{min-height:64px;resize:vertical}
+.primary{width:100%;background:var(--gold);color:#17110a;border:0;border-radius:14px;padding:15px;font-weight:700;font-size:15px;margin-top:14px}
+.primary:disabled{opacity:.5}
+.ghost{width:100%;background:none;border:1px solid var(--line);border-radius:14px;padding:13px;font-weight:600;margin-top:8px;color:var(--muted)}
+.choices{display:grid;gap:8px}
+.choices button{background:var(--raise);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:left;font-weight:600}
+.choices button:active{border-color:var(--gold)}
+.err{color:#ff9b8f;font-size:13px;margin:10px 0 0}
+.done{text-align:center;padding:16px 0 4px}
+.done .mark{width:64px;height:64px;border-radius:50%;border:2px solid var(--gold);display:grid;place-items:center;margin:0 auto 10px}
+.done .mark svg{width:30px;stroke:var(--gold);fill:none;stroke-width:2.2}
+
+/* Print QR */
+.qr-page{max-width:900px;margin:0 auto;padding-block:20px}
+.qr-tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:18px;color:var(--muted);font-size:13px}
+.qr-tools button{background:var(--gold);color:#17110a;border:0;border-radius:10px;padding:10px 16px;font-weight:700}
+.qr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.qr-card{background:#0f0c0b;border:1.5px solid var(--gold);border-radius:14px;padding:22px 18px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px;break-inside:avoid}
+.qr-card img.logo{width:44px}
+.qr-card .b{font:700 30px/1 var(--display);color:var(--gold);letter-spacing:.06em}
+.qr-card .t{font:600 22px/1 var(--display);color:var(--fg)}
+.qr-card .qr{background:#fff;padding:10px;border-radius:10px}
+.qr-card .qr img,.qr-card .qr canvas{display:block;width:170px!important;height:170px!important}
+.qr-card .s{font-size:12px;color:var(--fg);letter-spacing:.06em}
+.qr-card .u{font-size:9px;color:var(--muted);word-break:break-all}
+@media print{
+  body{padding:0;background:#fff}
+  .qr-tools{display:none}
+  .qr-grid{grid-template-columns:1fr 1fr;gap:10mm}
+  .qr-card{-webkit-print-color-adjust:exact;print-color-adjust:exact;height:120mm;justify-content:center}
+}
+@media (prefers-reduced-motion:no-preference){
+  .sheet{animation:up .22s ease-out}
+  @keyframes up{from{transform:translateY(30px);opacity:.6}to{transform:none;opacity:1}}
+}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div class="cartbar" id="cartbar" hidden><button id="cartbtn" type="button"><span><span class="cnt" id="cnt">0</span><span id="cartlbl">Корзина</span></span><span id="carttotal"></span></button></div>
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" hidden role="dialog" aria-modal="true"><div class="sheet-in"><div class="grip"></div><div id="sheetbody"></div></div></div>
+
+<script src="config.js"></script>
+<script>
+"use strict";
+var DEFAULT_MENU = {"cats": [{"ru": "Салаты", "en": "Salads"}, {"ru": "Закуски и гарниры", "en": "Snacks & Sides"}, {"ru": "Первые блюда", "en": "Soups"}, {"ru": "Вторые блюда", "en": "Main Courses"}, {"ru": "Особенные блюда", "en": "Special Dishes"}, {"ru": "Десерты", "en": "Desserts"}, {"ru": "Детское меню", "en": "Kids Menu"}, {"ru": "Напитки и чай", "en": "Drinks & Tea"}, {"ru": "Алкоголь", "en": "Alcohol"}], "items": [{"id": 1, "cat": "Салаты", "ru": "Фирменный салат «Гранат»", "en": "Signature Salad \"Granat\"", "dru": "Теплый салат с курицей, грецким орехом и зернами граната.", "den": "Warm salad with chicken, walnuts and pomegranate seeds.", "price": 130000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 2, "cat": "Салаты", "ru": "Винегрет", "en": "Vinaigrette", "dru": "Традиционный салат из отварных овощей с солеными огурцами и маслом.", "den": "Traditional salad of boiled vegetables with pickles and oil.", "price": 120000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 3, "cat": "Салаты", "ru": "Свежий салат", "en": "Fresh Vegetable Salad", "dru": "Микс сезонных овощей с зеленью и маслом.", "den": "Mix of seasonal fresh vegetables with herbs and oil.", "price": 100000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 4, "cat": "Салаты", "ru": "Ачичук", "en": "Achichuk (Tomato & Onion Salad)", "dru": "Тонко нарезанные помидоры со сладким луком. Идеально к плову.", "den": "Thinly sliced tomatoes with sweet onions. Perfect with pilaf.", "price": 90000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 5, "cat": "Салаты", "ru": "Хрустящие баклажаны", "en": "Crispy Eggplant Salad", "dru": "Обжаренные баклажаны с томатами, кинзой и сладким чили соусом.", "den": "Fried eggplant with tomatoes, cilantro and sweet chili sauce.", "price": 120000, "oru": "", "oen": "", "img": "eggplant.jpg", "on": true}, {"id": 6, "cat": "Салаты", "ru": "Оливье", "en": "Olivier Salad", "dru": "Традиционный салат с отварной курицей и солеными огурцами.", "den": "Traditional salad with boiled chicken and pickles.", "price": 120000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 7, "cat": "Салаты", "ru": "Кимчи", "en": "Kimchi", "dru": "Острая ферментированная пекинская капуста.", "den": "Spicy fermented napa cabbage.", "price": 100000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 8, "cat": "Салаты", "ru": "Японский салат", "en": "Japanese Salad", "dru": "Говядина со свежими помидорами, луком и болгарским перцем.", "den": "Beef with fresh tomatoes, onions and bell peppers.", "price": 150000, "oru": "", "oen": "", "img": "japanese.jpg", "on": true}, {"id": 9, "cat": "Салаты", "ru": "Цезарь с курицей", "en": "Caesar Salad with Chicken", "dru": "Салат айсберг, куриное филе, соус цезарь.", "den": "Iceberg lettuce, chicken fillet, Caesar sauce.", "price": 120000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 10, "cat": "Салаты", "ru": "Цезарь с креветками", "en": "Caesar Salad with Shrimp", "dru": "Классический салат с тигровыми креветками, пармезаном и сухариками.", "den": "Classic salad with tiger prawns, parmesan and croutons.", "price": 130000, "oru": "", "oen": "", "img": "caesar-shrimp.jpg", "on": true}, {"id": 11, "cat": "Закуски и гарниры", "ru": "Ассорти солений", "en": "Assorted Pickles", "dru": "", "den": "", "price": 120000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 12, "cat": "Закуски и гарниры", "ru": "Креветки (100 г)", "en": "Shrimp (100 g)", "dru": "", "den": "", "price": 140000, "oru": "вареные / жареные", "oen": "boiled / fried", "img": "shrimp.jpg", "on": true}, {"id": 13, "cat": "Закуски и гарниры", "ru": "Картофель фри", "en": "French Fries", "dru": "", "den": "", "price": 70000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 14, "cat": "Закуски и гарниры", "ru": "Картофельное пюре", "en": "Mashed Potatoes", "dru": "", "den": "", "price": 70000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 15, "cat": "Закуски и гарниры", "ru": "Рис", "en": "Steamed Rice", "dru": "", "den": "", "price": 60000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 16, "cat": "Закуски и гарниры", "ru": "Гречка", "en": "Buckwheat", "dru": "", "den": "", "price": 70000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 17, "cat": "Закуски и гарниры", "ru": "Овощи на гриле", "en": "Grilled Vegetables", "dru": "", "den": "", "price": 120000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 18, "cat": "Закуски и гарниры", "ru": "Чебурек с мясом (1 шт.)", "en": "Cheburek with Meat (1 pc)", "dru": "", "den": "", "price": 100000, "oru": "", "oen": "", "img": "cheburek.jpg", "on": true}, {"id": 19, "cat": "Закуски и гарниры", "ru": "Лепешки", "en": "Flatbreads", "dru": "", "den": "", "price": 50000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 20, "cat": "Закуски и гарниры", "ru": "Хлеб", "en": "Bread", "dru": "", "den": "", "price": 50000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 21, "cat": "Первые блюда", "ru": "Борщ", "en": "Borscht", "dru": "Традиционный суп из свеклы с курицей.", "den": "Traditional beetroot soup with chicken.", "price": 110000, "oru": "", "oen": "", "img": "borscht.jpg", "on": true}, {"id": 22, "cat": "Первые блюда", "ru": "Суп куриный с лапшой", "en": "Chicken Noodle Soup", "dru": "Наваристый куриный бульон с домашней лапшой.", "den": "Rich chicken broth with homemade noodles.", "price": 100000, "oru": "", "oen": "", "img": "chicken-noodle.jpg", "on": true}, {"id": 23, "cat": "Первые блюда", "ru": "Окрошка на кефире", "en": "Okroshka with Kefir", "dru": "Холодный суп с овощами и отварной курицей.", "den": "Cold vegetable soup with boiled chicken.", "price": 110000, "oru": "", "oen": "", "img": "okroshka.jpg", "on": true}, {"id": 24, "cat": "Первые блюда", "ru": "Окрошка на квасе", "en": "Okroshka with Kvass", "dru": "Холодный суп с овощами и отварной курицей.", "den": "Cold vegetable soup with boiled chicken.", "price": 130000, "oru": "", "oen": "", "img": "okroshka.jpg", "on": true}, {"id": 25, "cat": "Первые блюда", "ru": "Лагман", "en": "Lagman (Noodle Soup)", "dru": "Домашняя тянутая лапша с говядиной и овощами.", "den": "Homemade hand-pulled noodles with beef and vegetables.", "price": 120000, "oru": "", "oen": "", "img": "lagman.jpg", "on": true}, {"id": 26, "cat": "Первые блюда", "ru": "Мастава", "en": "Mastava", "dru": "Традиционный узбекский густой суп с говядиной, рисом и овощами.", "den": "Traditional Uzbek thick soup with beef, rice and vegetables.", "price": 110000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 27, "cat": "Первые блюда", "ru": "Кукси", "en": "Kuksi", "dru": "Холодный корейский суп с лапшой, говядиной и свежими овощами.", "den": "Cold Korean noodle soup with beef and fresh vegetables.", "price": 150000, "oru": "", "oen": "", "img": "kuksi.jpg", "on": true}, {"id": 28, "cat": "Первые блюда", "ru": "Шурпа", "en": "Shurpa", "dru": "Наваристый суп из говядины с крупно нарезанными овощами.", "den": "Hearty beef soup with chunky vegetables.", "price": 150000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 29, "cat": "Первые блюда", "ru": "Пельмени с бульоном", "en": "Dumplings in Broth", "dru": "Наваристый говяжий бульон с домашними пельменями.", "den": "Rich beef broth with homemade dumplings.", "price": 150000, "oru": "", "oen": "", "img": "pelmeni-broth.jpg", "on": true}, {"id": 30, "cat": "Вторые блюда", "ru": "Томленая говядина с овощами", "en": "Slow-Braised Beef with Vegetables", "dru": "Нежная говядина, томленая в собственном соку с сезонными овощами и ароматными специями.", "den": "Tender beef slow-cooked in its own juices with seasonal vegetables and aromatic herbs.", "price": 150000, "oru": "", "oen": "", "img": "braised-beef.jpg", "on": true}, {"id": 31, "cat": "Вторые блюда", "ru": "Голубцы / Перец фаршированный", "en": "Cabbage Rolls / Stuffed Bell Peppers", "dru": "Сочная говядина с рисом в листьях капусты или болгарском перце. Томятся в ароматном томатном соусе, подаются со сметаной.", "den": "Tender minced beef and rice in cabbage leaves or bell peppers, simmered in tomato sauce and served with sour cream.", "price": 130000, "oru": "голубцы / перец", "oen": "cabbage rolls / bell peppers", "img": "", "on": true}, {"id": 32, "cat": "Вторые блюда", "ru": "Котлета с гарниром", "en": "Beef Patty with Side Dish", "dru": "Сочная домашняя котлета из отборной говядины, обжаренная до золотистой корочки. Подается с гарниром на ваш выбор.", "den": "Juicy homemade beef patty, pan-seared to perfection. Served with a side dish of your choice.", "price": 150000, "oru": "картофель фри / пюре / рис / гречка", "oen": "French fries / mashed potatoes / rice / buckwheat", "img": "", "on": true}, {"id": 33, "cat": "Вторые блюда", "ru": "Лапша с морепродуктами", "en": "Seafood Stir-fry Noodles", "dru": "Пшеничная лапша с тигровыми креветками и нежным кальмаром в пикантном соусе с хрустящими овощами.", "den": "Wheat noodles with tiger prawns and tender squid in a savory sauce with crisp vegetables.", "price": 150000, "oru": "", "oen": "", "img": "seafood-noodles.jpg", "on": true}, {"id": 34, "cat": "Вторые блюда", "ru": "Сосиски с гарниром", "en": "Sausages with Side Dish", "dru": "Сочные мясные сосиски, отварные или обжаренные до румяной корочки. Подаются с гарниром на ваш выбор.", "den": "Juicy sausages, boiled or pan-fried until golden brown. Served with a side dish of your choice.", "price": 120000, "oru": "картофель фри / пюре / рис / гречка", "oen": "French fries / mashed potatoes / rice / buckwheat", "img": "", "on": true}, {"id": 35, "cat": "Вторые блюда", "ru": "Жареная картошка с мясом", "en": "Fried Potatoes with Meat", "dru": "Золотистый картофель, обжаренный с кусочками мяса и луком.", "den": "Golden fried potatoes with tender meat chunks and onions.", "price": 150000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 36, "cat": "Вторые блюда", "ru": "Пельмени", "en": "Pelmeni (Boiled Meat Dumplings)", "dru": "Традиционные отварные пельмени ручной лепки со сметаной.", "den": "Traditional handmade boiled meat dumplings served with sour cream.", "price": 130000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 37, "cat": "Вторые блюда", "ru": "Плов", "en": "Plov (Uzbek Pilaf)", "dru": "Традиционный рис с говядиной, желтой морковью и специями.", "den": "Traditional rice dish with beef, carrots and spices.", "price": 150000, "oru": "", "oen": "", "img": "plov.jpg", "on": true}, {"id": 38, "cat": "Вторые блюда", "ru": "Манты", "en": "Manti (Steamed Dumplings)", "dru": "Большие паровые пельмени с рубленым мясом и луком.", "den": "Large steamed dumplings filled with chopped meat and onions.", "price": 150000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 39, "cat": "Вторые блюда", "ru": "Вареники с картошкой", "en": "Vareniki with Potato", "dru": "Домашние вареники с нежным картофельным пюре. Подаются со сметаной.", "den": "Handmade dumplings filled with mashed potatoes. Served with sour cream.", "price": 110000, "oru": "", "oen": "", "img": "vareniki.jpg", "on": true}, {"id": 40, "cat": "Вторые блюда", "ru": "Жареная рыба", "en": "Fried Fish", "dru": "Сочная рыба с хрустящей корочкой, подается с лимоном.", "den": "Juicy fish fried to a crisp, served with lemon.", "price": 250000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 41, "cat": "Вторые блюда", "ru": "Стейк из говядины с овощами", "en": "Beef Steak with Vegetables", "dru": "Сочный стейк прожарки на ваш выбор, подается с овощами гриль.", "den": "Juicy beef steak cooked to your liking, served with grilled vegetables.", "price": 280000, "oru": "medium rare / medium / medium well / well done", "oen": "medium rare / medium / medium well / well done", "img": "steak.jpg", "on": true}, {"id": 42, "cat": "Вторые блюда", "ru": "Стейк из семги с овощами", "en": "Salmon Steak with Vegetables", "dru": "Нежное филе семги на гриле с гарниром из сезонных овощей.", "den": "Grilled salmon steak served with seasonal vegetables and lemon.", "price": 280000, "oru": "", "oen": "", "img": "salmon.jpg", "on": true}, {"id": 43, "cat": "Вторые блюда", "ru": "Лосось в соусе «Зеленая симфония»", "en": "Salmon in \"Green Symphony\" Sauce", "dru": "Стейк лосося под нежным сливочно-шпинатным соусом.", "den": "Salmon steak with creamy spinach sauce.", "price": 280000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 44, "cat": "Вторые блюда", "ru": "Казан-кебаб", "en": "Kazan Kebab", "dru": "Обжаренное мясо с золотистым картофелем и специями.", "den": "Fried meat with golden potatoes and spices.", "price": 250000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 45, "cat": "Особенные блюда", "ru": "Паста Альфредо", "en": "Pasta Alfredo", "dru": "Классическая паста в нежном сливочном соусе с пармезаном.", "den": "Classic pasta in a creamy parmesan sauce.", "price": 180000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 46, "cat": "Особенные блюда", "ru": "Чоп стейк из курицы", "en": "Chicken Chop Steak", "dru": "Сочное куриное филе, обжаренное до золотистой корочки, подается с гарниром.", "den": "Juicy chicken fillet, pan-seared to perfection, served with a side dish.", "price": 150000, "oru": "картофель фри / пюре / рис / гречка", "oen": "French fries / mashed potatoes / rice / buckwheat", "img": "", "on": true}, {"id": 47, "cat": "Особенные блюда", "ru": "Долма", "en": "Dolma", "dru": "Нежные виноградные листья, начиненные мясным фаршем с рисом и специями.", "den": "Tender grape leaves stuffed with minced meat, rice and aromatic spices.", "price": 150000, "oru": "", "oen": "", "img": "dolma.jpg", "on": true}, {"id": 48, "cat": "Особенные блюда", "ru": "Жареный лагман", "en": "Fried Lagman", "dru": "Традиционная тянутая лапша, обжаренная с мясом и сезонными овощами.", "den": "Traditional hand-pulled noodles stir-fried with meat and seasonal vegetables.", "price": 150000, "oru": "", "oen": "", "img": "fried-lagman.jpg", "on": true}, {"id": 49, "cat": "Особенные блюда", "ru": "Манты с тыквой", "en": "Pumpkin Manti", "dru": "Традиционные паровые манты с начинкой из сладкой тыквы и специй.", "den": "Traditional steamed dumplings with pumpkin and oriental spices.", "price": 130000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 50, "cat": "Особенные блюда", "ru": "Жареные пельмени", "en": "Fried Pelmeni", "dru": "Золотистые обжаренные пельмени с мясной начинкой, подаются со сметаной.", "den": "Golden fried meat dumplings, served with sour cream.", "price": 150000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 51, "cat": "Особенные блюда", "ru": "Самса с мясом (1 шт.)", "en": "Meat Samsa (1 pc)", "dru": "Ароматная выпечка из тонкого слоеного теста с сочной начинкой из рубленого мяса и лука.", "den": "Aromatic flaky pastry with a juicy filling of chopped meat and onions.", "price": 100000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 52, "cat": "Особенные блюда", "ru": "Самса с тыквой (1 шт.)", "en": "Pumpkin Samsa (1 pc)", "dru": "Традиционная слоеная выпечка с сочной начинкой из тыквы и лука.", "den": "Traditional flaky pastry with a juicy pumpkin and onion filling.", "price": 80000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 53, "cat": "Десерты", "ru": "Чак-чак", "en": "Chak-Chak", "dru": "Восточная сладость из обжаренного теста в натуральном меду.", "den": "Traditional oriental sweet made of fried dough with natural honey.", "price": 120000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 54, "cat": "Десерты", "ru": "Сочники", "en": "Sochniki (Curd Pastry)", "dru": "Песочное тесто с сочной начинкой из домашнего творога.", "den": "Shortcrust pastry with juicy homemade cottage cheese filling.", "price": 110000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 55, "cat": "Десерты", "ru": "Муравейник", "en": "Muraveinik (Anthill Cake)", "dru": "Домашний десерт из песочной крошки и сгущенного молока.", "den": "Homemade dessert with pastry crumbs and condensed milk.", "price": 110000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 56, "cat": "Десерты", "ru": "Торт «Медовик»", "en": "Honey Cake \"Medovik\"", "dru": "Многослойный медовый торт с нежным сметанным кремом.", "den": "Layered honey cake with delicate sour cream frosting.", "price": 120000, "oru": "", "oen": "", "img": "medovik.jpg", "on": true}, {"id": 57, "cat": "Десерты", "ru": "Торт «Наполеон»", "en": "Napoleon Cake", "dru": "Классический торт из тонких слоев хрустящего теста и заварного крема.", "den": "Classic cake made of thin layers of crispy pastry and custard.", "price": 120000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 58, "cat": "Десерты", "ru": "Чизкейк", "en": "Cheesecake", "dru": "Нежный десерт с бархатистой сливочной текстурой на хрустящем песочном корже.", "den": "Delicate dessert with a velvety creamy texture on a crunchy shortbread crust.", "price": 120000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 59, "cat": "Десерты", "ru": "Шоколадный торт", "en": "Chocolate Cake", "dru": "Насыщенный десерт для истинных любителей шоколада.", "den": "Rich dessert for true chocolate lovers.", "price": 120000, "oru": "", "oen": "", "img": "choc-cake.jpg", "on": true}, {"id": 60, "cat": "Десерты", "ru": "Орешки со сгущенкой", "en": "Oreshki (Walnut Cookies with Dulce de Leche)", "dru": "Традиционное печенье с начинкой из вареной сгущенки.", "den": "Traditional cookies filled with dulce de leche.", "price": 150000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 61, "cat": "Десерты", "ru": "Мороженое", "en": "Ice Cream", "dru": "Нежный десерт с классическими вкусами на выбор.", "den": "Delicate dessert with classic flavor options.", "price": 100000, "oru": "шоколадное / сливочное / клубничное", "oen": "chocolate / vanilla / strawberry", "img": "", "on": true}, {"id": 62, "cat": "Детское меню", "ru": "Куриный суп с лапшой", "en": "Chicken Noodle Soup", "dru": "", "den": "", "price": 100000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 63, "cat": "Детское меню", "ru": "Суп с фрикадельками", "en": "Meatball Soup", "dru": "", "den": "", "price": 120000, "oru": "", "oen": "", "img": "meatball-soup.jpg", "on": true}, {"id": 64, "cat": "Детское меню", "ru": "Куриные наггетсы + фри", "en": "Chicken Nuggets with French Fries", "dru": "", "den": "", "price": 120000, "oru": "", "oen": "", "img": "nuggets.jpg", "on": true}, {"id": 65, "cat": "Детское меню", "ru": "Котлетки с пюре", "en": "Cutlets with Mashed Potatoes", "dru": "", "den": "", "price": 150000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 66, "cat": "Детское меню", "ru": "Сосиски с гарниром", "en": "Sausages with Side Dish", "dru": "", "den": "", "price": 120000, "oru": "пюре / макароны", "oen": "mashed potatoes / pasta", "img": "", "on": true}, {"id": 67, "cat": "Напитки и чай", "ru": "Ягодный морс, стакан 150 мл", "en": "Berry Fruit Drink, glass 150 ml", "dru": "", "den": "", "price": 50000, "oru": "", "oen": "", "img": "mors.jpg", "on": true}, {"id": 68, "cat": "Напитки и чай", "ru": "Ягодный морс, кувшин 1 л", "en": "Berry Fruit Drink, pitcher 1 l", "dru": "", "den": "", "price": 150000, "oru": "", "oen": "", "img": "mors.jpg", "on": true}, {"id": 69, "cat": "Напитки и чай", "ru": "Смузи", "en": "Smoothie", "dru": "", "den": "", "price": 60000, "oru": "манго / маракуйя", "oen": "mango / passion fruit", "img": "", "on": true}, {"id": 70, "cat": "Напитки и чай", "ru": "Свежевыжатый апельсиновый сок", "en": "Fresh Orange Juice", "dru": "", "den": "", "price": 60000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 71, "cat": "Напитки и чай", "ru": "Газировка", "en": "Soft Drink", "dru": "", "den": "", "price": 30000, "oru": "Coca-Cola / Pepsi / Fanta", "oen": "Coca-Cola / Pepsi / Fanta", "img": "", "on": true}, {"id": 72, "cat": "Напитки и чай", "ru": "Вода с газом", "en": "Sparkling Water", "dru": "", "den": "", "price": 25000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 73, "cat": "Напитки и чай", "ru": "Вода без газа", "en": "Still Water", "dru": "", "den": "", "price": 20000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 74, "cat": "Напитки и чай", "ru": "Чай", "en": "Tea", "dru": "", "den": "", "price": 50000, "oru": "зеленый / черный", "oen": "green / black", "img": "tea.jpg", "on": true}, {"id": 75, "cat": "Напитки и чай", "ru": "Ташкентский чай", "en": "Tashkent Tea", "dru": "", "den": "", "price": 80000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 76, "cat": "Напитки и чай", "ru": "Чай с молоком", "en": "Milk Tea", "dru": "", "den": "", "price": 100000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 77, "cat": "Напитки и чай", "ru": "Добавка к чаю", "en": "Tea Add-on", "dru": "", "den": "", "price": 30000, "oru": "лимон / мята / лайм / имбирь", "oen": "lemon / mint / lime / ginger", "img": "", "on": true}, {"id": 78, "cat": "Алкоголь", "ru": "Пиво Sapporo", "en": "Sapporo Beer", "dru": "", "den": "", "price": 50000, "oru": "", "oen": "", "img": "beer.jpg", "on": true}, {"id": 79, "cat": "Алкоголь", "ru": "Пиво Tiger", "en": "Tiger Beer", "dru": "", "den": "", "price": 40000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 80, "cat": "Алкоголь", "ru": "Пиво Saigon", "en": "Saigon Beer", "dru": "", "den": "", "price": 25000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 81, "cat": "Алкоголь", "ru": "Красное вино, бокал", "en": "House Red Wine, glass", "dru": "", "den": "", "price": 120000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 82, "cat": "Алкоголь", "ru": "Красное вино, бутылка", "en": "House Red Wine, bottle", "dru": "", "den": "", "price": 450000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 83, "cat": "Алкоголь", "ru": "Белое вино, бокал", "en": "House White Wine, glass", "dru": "", "den": "", "price": 120000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 84, "cat": "Алкоголь", "ru": "Белое вино, бутылка", "en": "House White Wine, bottle", "dru": "", "den": "", "price": 450000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 85, "cat": "Алкоголь", "ru": "Шампанское, бутылка", "en": "Champagne, bottle", "dru": "", "den": "", "price": 500000, "oru": "", "oen": "", "img": "", "on": true}, {"id": 86, "cat": "Алкоголь", "ru": "Ром / водка (100 мл)", "en": "Rum / Vodka (100 ml)", "dru": "", "den": "", "price": 100000, "oru": "ром / водка", "oen": "rum / vodka", "img": "", "on": true}, {"id": 87, "cat": "Алкоголь", "ru": "Самогон / настойка (100 мл)", "en": "Moonshine / Infused Spirit (100 ml)", "dru": "", "den": "", "price": 120000, "oru": "самогон / настойка", "oen": "moonshine / infused spirit", "img": "", "on": true}], "tables": [{"n": 1, "ru": "Стол 1", "en": "Table 1"}, {"n": 2, "ru": "Стол 2", "en": "Table 2"}, {"n": 3, "ru": "Стол 3", "en": "Table 3"}, {"n": 4, "ru": "Стол 4", "en": "Table 4"}, {"n": 5, "ru": "Стол 5", "en": "Table 5"}, {"n": 6, "ru": "Стол 6", "en": "Table 6"}, {"n": 7, "ru": "Терраса · стол 7", "en": "Terrace · table 7"}]};
+var INFO = {wifi:"Yuliana", pass:"09090909", insta:"granat_nhatrang", phones:"+84 775 874 534 · +7 916 129 99 64", address:"24/17 Hùng Vương (số mới 100/23), Nha Trang"};
+
+var T = {
+  ru:{table:"Стол",noTable:"Стол не выбран",waiter:"Позвать официанта",bill:"Попросить счет",add:"Добавить",cart:"Корзина",yourOrder:"Ваш заказ",
+      total:"Итого",comment:"Комментарий к заказу",commentPh:"Например: без лука, принести все сразу",send:"Отправить заказ",payNote:"Оплата официанту после еды.",
+      empty:"В корзине пока ничего нет.",sold:"Нет в наличии",choose:"Выберите вариант",chooseTable:"Выберите ваш стол",chooseTableNote:"Номер стола указан на табличке с QR-кодом.",
+      sent:"Заказ отправлен",sentNote:"Официант уже получил заказ и скоро подойдет.",num:"Заказ №",ok:"Хорошо",
+      waiterSent:"Официант скоро подойдет",billSent:"Счет скоро принесут",payHow:"Как удобнее оплатить?",cash:"Наличными",card:"Картой",transfer:"Переводом по QR",
+      fail:"Не получилось отправить. Попробуйте еще раз или позовите официанта.",often:"Заказ с этого стола только что отправлен. Подождите 15 секунд.",cancel:"Отмена",demo:"Демо-режим: заказы пока никуда не отправляются.",
+      wifi:"Wi‑Fi",pass:"пароль",copy:"Копировать",copied:"Скопировано",wait:"Можно повторить через минуту",sending:"Отправляем…",remove:"Убрать"},
+  en:{table:"Table",noTable:"No table selected",waiter:"Call a waiter",bill:"Ask for the bill",add:"Add",cart:"Cart",yourOrder:"Your order",
+      total:"Total",comment:"Note for the kitchen",commentPh:"E.g. no onions, serve everything at once",send:"Place order",payNote:"You pay the waiter after the meal.",
+      empty:"Your cart is empty.",sold:"Sold out",choose:"Choose an option",chooseTable:"Choose your table",chooseTableNote:"The table number is on the QR stand.",
+      sent:"Order sent",sentNote:"The waiter has your order and will come by shortly.",num:"Order #",ok:"OK",
+      waiterSent:"A waiter is on the way",billSent:"Your bill is on the way",payHow:"How would you like to pay?",cash:"Cash",card:"Card",transfer:"Bank transfer (QR)",
+      fail:"Could not send. Try again or call a waiter.",often:"An order from this table was just sent. Please wait 15 seconds.",cancel:"Cancel",demo:"Demo mode: orders are not sent anywhere yet.",
+      wifi:"Wi‑Fi",pass:"password",copy:"Copy",copied:"Copied",wait:"You can repeat in a minute",sending:"Sending…",remove:"Remove"}
+};
+
+var API = (window.GRANAT_API || "").trim();
+var MENU = DEFAULT_MENU;
+var params = new URLSearchParams(location.search);
+function store(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
+var lang = store("granat_lang") || ((navigator.language||"ru").toLowerCase().indexOf("ru")===0 ? "ru" : "en");
+function savedTable(){try{var o=JSON.parse(store("granat_table")||"null");if(o&&o.n&&Date.now()-o.at<4*3600e3)return String(o.n)}catch(e){}return""}
+function saveTable(n){store("granat_table",JSON.stringify({n:n,at:Date.now()}))}
+var table = params.get("t") || (/^#t(\d+)$/.exec(location.hash)||[])[1] || savedTable();
+var cart = {};
+try{cart = JSON.parse(store("granat_cart")||"{}")||{}}catch(e){cart={}}
+var cooldown = {};
+
+function t(k){return T[lang][k]}
+function fmt(n){return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g,".")+" ₫"}
+function h(tag,attrs,kids){var el=document.createElement(tag);if(attrs)for(var k in attrs){var v=attrs[k];if(v==null||v===false)continue;if(k==="text")el.textContent=v;else if(k.slice(0,2)==="on")el.addEventListener(k.slice(2),v);else el.setAttribute(k,v===true?"":v)}
+  (kids||[]).forEach(function(c){if(c!=null&&c!==false)el.appendChild(typeof c==="string"?document.createTextNode(c):c)});return el}
+function svg(path){var s=document.createElementNS("http://www.w3.org/2000/svg","svg");s.setAttribute("viewBox","0 0 24 24");s.innerHTML=path;return s}
+var ICON_BELL='<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/>';
+var ICON_BILL='<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/>';
+var ICON_OK='<path d="M5 12.5l4.5 4.5L19 7.5"/>';
+
+function itemById(id){for(var i=0;i<MENU.items.length;i++)if(String(MENU.items[i].id)===String(id))return MENU.items[i];return null}
+function nm(it){return lang==="ru"?it.ru:(it.en||it.ru)}
+function opts(it){var s=lang==="ru"?it.oru:(it.oen||it.oru);return s?s.split("/").map(function(x){return x.trim()}).filter(Boolean):[]}
+function optLabel(it,i){var o=opts(it);return o[i]||""}
+function tables(){return MENU.tables&&MENU.tables.length?MENU.tables:DEFAULT_MENU.tables}
+function tableName(n){var tb=tables();for(var i=0;i<tb.length;i++)if(String(tb[i].n)===String(n))return lang==="ru"?tb[i].ru:tb[i].en;return n?t("table")+" "+n:""}
+function imgSrc(f){if(!f)return"";return /^https?:/.test(f)?f:"img/"+f}
+function saveCart(){store("granat_cart",JSON.stringify(cart))}
+function cartLines(){var out=[];Object.keys(cart).forEach(function(k){var q=cart[k];var p=k.split("|");var it=itemById(p[0]);if(!it||q<=0||it.on===false){delete cart[k];return}out.push({key:k,it:it,opt:p[1]===""?-1:+p[1],qty:q})});return out}
+function cartCount(){return cartLines().reduce(function(s,l){return s+l.qty},0)}
+function cartSum(){return cartLines().reduce(function(s,l){return s+l.qty*l.it.price},0)}
+function qtyOf(id){var s=0;Object.keys(cart).forEach(function(k){if(k.split("|")[0]===String(id))s+=cart[k]});return s}
+
+/* ---------- Menu page ---------- */
+function render(){
+  document.documentElement.lang=lang;
+  var app=document.getElementById("app");app.innerHTML="";
+  var langBox=h("div",{class:"lang",role:"group","aria-label":"Language"},["ru","en"].map(function(l){return h("button",{type:"button","aria-pressed":String(lang===l),text:l.toUpperCase(),onclick:function(){lang=l;store("granat_lang",l);render()}})}));
+  var pill=h("button",{type:"button",class:"table-pill",onclick:pickTable},table?[t("table")+": ",h("b",{text:tableName(table).replace(/^(Стол|Table)\s*/,"")})]:[t("noTable")]);
+  var bell=h("button",{type:"button",id:"btn-waiter",onclick:function(){service("waiter")}},[svg(ICON_BELL),t("waiter")]);
+  var bill=h("button",{type:"button",id:"btn-bill",onclick:askBill},[svg(ICON_BILL),t("bill")]);
+  if(cooldown.waiter>Date.now())bell.disabled=true;
+  if(cooldown.bill>Date.now())bill.disabled=true;
+  app.appendChild(h("header",{class:"top"},[
+    h("img",{src:"img/logo.png",alt:""}),
+    h("div",{class:"brand"},["GRANAT",h("small",{text:"Restaurant"})]),
+    h("div",{class:"bar"},[pill,langBox]),
+    h("div",{class:"service"},[bell,bill]),
+    API?null:h("div",{class:"demo",text:t("demo")})
+  ]));
+  var nav=h("nav",{class:"cats",id:"cats","aria-label":"Menu sections"});
+  MENU.cats.forEach(function(c,i){
+    if(!MENU.items.some(function(it){return it.cat===c.ru}))return;
+    nav.appendChild(h("button",{type:"button","data-i":i,text:lang==="ru"?c.ru:c.en,onclick:function(){document.getElementById("s"+i).scrollIntoView({behavior:"smooth"})}}));
+  });
+  app.appendChild(nav);
+  MENU.cats.forEach(function(c,i){
+    var items=MENU.items.filter(function(it){return it.cat===c.ru});
+    if(!items.length)return;
+    var sec=h("section",{id:"s"+i},[h("h2",{text:lang==="ru"?c.ru:c.en}),h("div",{class:"orn"})]);
+    items.forEach(function(it){sec.appendChild(itemEl(it))});
+    app.appendChild(sec);
+  });
+  app.appendChild(h("footer",null,[
+    h("div",{class:"wifi"},[h("div",null,[h("b",{text:t("wifi")+": "+INFO.wifi}),h("br"),t("pass")+": "+INFO.pass]),
+      h("button",{type:"button",text:t("copy"),onclick:function(e){copy(INFO.pass,e.currentTarget)}})]),
+    h("div",null,["Instagram: ",h("a",{href:"https://instagram.com/"+INFO.insta,target:"_blank",rel:"noopener",text:"@"+INFO.insta})]),
+    h("div",{text:INFO.phones}),
+    h("div",{text:INFO.address})
+  ]));
+  updateBar();spy();
+}
+function itemEl(it){
+  var price=h("div",{class:"price"},[fmt(it.price).replace(" ₫",""),h("span",{text:"₫"})]);
+  var ctl;
+  if(it.on===false){ctl=h("span",{class:"soldout",text:t("sold")})}
+  else{
+    var q=qtyOf(it.id);var o=opts(it);
+    if(q>0&&!o.length){
+      ctl=h("div",{class:"step"},[h("button",{type:"button","aria-label":"−",text:"−",onclick:function(){change(it.id+"|",-1)}}),h("output",{text:String(q)}),h("button",{type:"button","aria-label":"+",text:"+",onclick:function(){change(it.id+"|",1)}})]);
+    }else{
+      ctl=h("button",{type:"button",class:"add",text:(q>0?q+" · ":"")+"+ "+t("add"),onclick:function(){o.length?pickOpt(it):change(it.id+"|",1)}});
+    }
+  }
+  var desc=lang==="ru"?it.dru:(it.den||it.dru);
+  var o2=opts(it);
+  var info=h("div",{class:"info"},[h("h3",{class:"name",text:nm(it)}),desc?h("p",{class:"desc",text:desc}):null,o2.length?h("p",{class:"opts",text:o2.join(" · ")}):null,h("div",{class:"row"},[price,ctl])]);
+  var el=h("div",{class:"item"+(it.img?" has-img":"")+(it.on===false?" off":""),"data-id":it.id},[it.img?h("img",{class:"thumb",src:imgSrc(it.img),alt:"",loading:"lazy"}):null,info]);
+  if(!it.img)el.style.gridTemplateColumns="1fr";
+  return el;
+}
+function refreshItem(id){var old=document.querySelector('.item[data-id="'+id+'"]');var it=itemById(id);if(old&&it)old.replaceWith(itemEl(it));updateBar()}
+function change(key,d){cart[key]=(cart[key]||0)+d;if(cart[key]<=0)delete cart[key];saveCart();refreshItem(key.split("|")[0])}
+function updateBar(){var c=cartCount();var bar=document.getElementById("cartbar");bar.hidden=c===0;
+  document.getElementById("cnt").textContent=c;document.getElementById("cartlbl").textContent=t("cart");document.getElementById("carttotal").textContent=fmt(cartSum())}
+function spy(){var nav=document.getElementById("cats");if(!nav)return;var secs=[].slice.call(document.querySelectorAll("section"));
+  function on(){var y=window.scrollY+120,cur=secs[0];secs.forEach(function(s){if(s.offsetTop<=y)cur=s});
+    [].forEach.call(nav.children,function(b){var a="s"+b.getAttribute("data-i")===(cur&&cur.id);if(a&&!b.classList.contains("on")){b.classList.add("on");b.scrollIntoView({block:"nearest",inline:"center"})}if(!a)b.classList.remove("on")})}
+  window.onscroll=on;on()}
+function copy(text,btn){var done=function(){btn.textContent=t("copied")};var no=function(){btn.textContent=text};try{navigator.clipboard.writeText(text).then(done,no)}catch(e){no()}}
+
+/* ---------- Sheets ---------- */
+function openSheet(nodes){var b=document.getElementById("sheetbody");b.innerHTML="";nodes.forEach(function(n){if(n)b.appendChild(n)});
+  document.getElementById("scrim").hidden=false;document.getElementById("sheet").hidden=false;document.body.style.overflow="hidden"}
+function closeSheet(){document.getElementById("scrim").hidden=true;document.getElementById("sheet").hidden=true;document.body.style.overflow=""}
+document.getElementById("scrim").onclick=closeSheet;
+document.getElementById("cartbtn").onclick=function(){showCart()};
+
+function pickOpt(it){
+  openSheet([h("h3",{text:nm(it)}),h("p",{class:"note",text:t("choose")}),
+    h("div",{class:"choices"},opts(it).map(function(o,i){return h("button",{type:"button",text:o,onclick:function(){change(it.id+"|"+i,1);closeSheet()}})})),
+    h("button",{type:"button",class:"ghost",text:t("cancel"),onclick:closeSheet})]);
+}
+function pickTable(then){
+  openSheet([h("h3",{text:t("chooseTable")}),h("p",{class:"note",text:t("chooseTableNote")}),
+    h("div",{class:"choices"},tables().map(function(tb){return h("button",{type:"button",text:lang==="ru"?tb.ru:tb.en,onclick:function(){table=String(tb.n);saveTable(table);closeSheet();render();if(typeof then==="function")then()}})})),
+    h("button",{type:"button",class:"ghost",text:t("cancel"),onclick:closeSheet})]);
+}
+function showCart(){
+  var lines=cartLines();
+  if(!lines.length){openSheet([h("h3",{text:t("yourOrder")}),h("p",{class:"note",text:t("empty")}),h("button",{type:"button",class:"ghost",text:t("ok"),onclick:closeSheet})]);return}
+  var list=h("div");
+  lines.forEach(function(l){
+    list.appendChild(h("div",{class:"line"},[
+      h("div",null,[h("div",{class:"n",text:nm(l.it)}),l.opt>=0?h("div",{class:"o",text:optLabel(l.it,l.opt)}):null,h("div",{class:"p",text:fmt(l.it.price)+" × "+l.qty})]),
+      h("div",{class:"step"},[h("button",{type:"button","aria-label":t("remove"),text:"−",onclick:function(){change(l.key,-1);showCart()}}),h("output",{text:String(l.qty)}),h("button",{type:"button","aria-label":"+",text:"+",onclick:function(){change(l.key,1);showCart()}})])
+    ]));
+  });
+  var ta=h("textarea",{id:"comment",placeholder:t("commentPh"),maxlength:"300"});ta.value=store("granat_comment")||"";ta.oninput=function(){store("granat_comment",ta.value)};
+  var err=h("p",{class:"err",hidden:true});
+  var btn=h("button",{type:"button",class:"primary",text:t("send")+" · "+fmt(cartSum())});
+  btn.onclick=function(){
+    if(!table){pickTable(showCart);return}
+    btn.disabled=true;btn.textContent=t("sending");err.hidden=true;
+    var payload={action:"order",table:table,lang:lang,comment:ta.value.trim(),items:cartLines().map(function(l){return{id:l.it.id,opt:l.opt>=0?((l.it.oru||l.it.oen||"").split("/")[l.opt]||"").trim():"",qty:l.qty}})};
+    send(payload).then(function(r){
+      cart={};saveCart();store("granat_comment","");render();
+      openSheet([h("div",{class:"done"},[h("div",{class:"mark"},[svg(ICON_OK)]),h("h3",{text:t("sent")}),h("p",{class:"note",text:(r.num?t("num")+r.num+". ":"")+t("sentNote")})]),h("button",{type:"button",class:"primary",text:t("ok"),onclick:closeSheet})]);
+    },function(e){btn.disabled=false;btn.textContent=t("send")+" · "+fmt(cartSum());err.textContent=t(e&&e.message==="too often"?"often":"fail");err.hidden=false});
+  };
+  openSheet([h("h3",{text:t("yourOrder")+(table?" · "+tableName(table):"")}),list,
+    h("div",{class:"total"},[h("span",{text:t("total")}),h("span",{text:fmt(cartSum())})]),
+    h("label",{class:"lbl","for":"comment",text:t("comment")}),ta,err,btn,h("p",{class:"note",style:"text-align:center;margin-top:10px",text:t("payNote")})]);
+}
+function askBill(){
+  openSheet([h("h3",{text:t("bill")}),h("p",{class:"note",text:t("payHow")}),
+    h("div",{class:"choices"},[["cash","Наличные"],["card","Карта"],["transfer","Перевод по QR"]].map(function(p){return h("button",{type:"button",text:t(p[0]),onclick:function(){closeSheet();service("bill",p[1])}})})),
+    h("button",{type:"button",class:"ghost",text:t("cancel"),onclick:closeSheet})]);
+}
+function service(kind,pay){
+  if(!table){pickTable(function(){kind==="bill"?askBill():service(kind)});return}
+  send({action:kind,table:table,pay:pay||""}).then(function(){
+    cooldown[kind]=Date.now()+60000;setTimeout(render,60500);render();
+    openSheet([h("div",{class:"done"},[h("div",{class:"mark"},[svg(ICON_OK)]),h("h3",{text:t(kind==="bill"?"billSent":"waiterSent")}),h("p",{class:"note",text:t("wait")})]),h("button",{type:"button",class:"primary",text:t("ok"),onclick:closeSheet})]);
+  },function(){openSheet([h("h3",{text:t("fail")}),h("button",{type:"button",class:"primary",text:t("ok"),onclick:closeSheet})])});
+}
+
+/* ---------- Network ---------- */
+function send(payload){
+  if(!API)return new Promise(function(res){setTimeout(function(){res({ok:true,num:""})},700)});
+  return fetch(API,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)})
+    .then(function(r){return r.json()}).then(function(j){if(!j||!j.ok)throw new Error(j&&j.error||"fail");return j});
+}
+function loadMenu(){
+  if(!API)return Promise.resolve();
+  var ctrl=window.AbortController?new AbortController():null;var tm=setTimeout(function(){ctrl&&ctrl.abort()},8000);
+  return fetch(API+"?action=menu",{signal:ctrl&&ctrl.signal}).then(function(r){return r.json()}).then(function(j){clearTimeout(tm);if(j&&j.items&&j.items.length){MENU=j}}).catch(function(){clearTimeout(tm)});
+}
+
+/* ---------- QR print page (?qr=1 or #qr) ---------- */
+function qrPage(){
+  document.getElementById("cartbar").remove();
+  var base=location.origin+location.pathname;
+  var app=document.getElementById("app");app.className="qr-page";app.innerHTML="";
+  app.appendChild(h("div",{class:"qr-tools"},[h("button",{type:"button",text:"Печать",onclick:function(){window.print()}}),"Таблички для столов. Печатайте в цвете, «Фон» в настройках печати должен быть включен."]));
+  var grid=h("div",{class:"qr-grid"});app.appendChild(grid);
+  tables().forEach(function(tb){
+    var url=base+"?t="+encodeURIComponent(tb.n);var box=h("div",{class:"qr"});
+    grid.appendChild(h("div",{class:"qr-card"},[h("img",{class:"logo",src:"img/logo.png",alt:""}),h("div",{class:"b",text:"GRANAT"}),h("div",{class:"t",text:tb.ru}),box,
+      h("div",{class:"s",text:"МЕНЮ И ЗАКАЗ · MENU & ORDER"}),h("div",{class:"u",text:url})]));
+    if(window.QRCode)new QRCode(box,{text:url,width:340,height:340,colorDark:"#0f0c0b",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M});
+    else box.appendChild(h("img",{alt:"QR",src:"https://api.qrserver.com/v1/create-qr-code/?size=340x340&margin=0&data="+encodeURIComponent(url)}));
+  });
+}
+if(params.has("qr")||location.hash==="#qr"){
+  var s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js";
+  s.onload=function(){loadMenu().then(qrPage)};s.onerror=function(){window.QRCode=null;loadMenu().then(qrPage)};document.head.appendChild(s);
+}else{
+  if(table)saveTable(table);
+  render();
+  loadMenu().then(function(){if(API)render()});
+}
+</script>
+</body>
+</html>
